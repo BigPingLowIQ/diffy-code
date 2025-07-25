@@ -10,6 +10,9 @@ import java.util.Locale;
 
 public class FileLogger {
     private BufferedWriter writer;
+    private int linesSinceFlush = 0;
+    private static final int FLUSH_THRESHOLD = 10;
+
 
     public void open() {
         Date now = new Date();
@@ -21,7 +24,7 @@ public class FileLogger {
             if (!dir.exists()) dir.mkdirs();
 
             File file = new File(dir, file_name);
-            writer = new BufferedWriter(new FileWriter(file, true)); // append = true
+            writer = new BufferedWriter(new FileWriter(file, true), 32 * 1024); // 32KB buffer
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -29,9 +32,17 @@ public class FileLogger {
 
     public void writeLine(String line) {
         if (writer == null) return;
+
         try {
             writer.write(line);
             writer.newLine();
+            linesSinceFlush++;
+
+            // Flush every N lines (not every 10ms!)
+            if (linesSinceFlush >= FLUSH_THRESHOLD) {
+                writer.flush();
+                linesSinceFlush = 0;
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -39,8 +50,9 @@ public class FileLogger {
 
     public void close() {
         if (writer == null) return;
+
         try {
-            writer.flush();  // flush to ensure all is written
+            writer.flush(); // Ensure all data is saved
             writer.close();
         } catch (IOException e) {
             e.printStackTrace();
