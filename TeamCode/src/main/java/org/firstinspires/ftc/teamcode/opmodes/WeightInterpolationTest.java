@@ -24,10 +24,10 @@ public class WeightInterpolationTest extends LinearOpMode {
     DataCollection data;
     public static int downPosition = 200;
     public static int upPosition = 2000;
-    public static int going_up_velocity = 140;
-    public static int going_down_velocity = 140;
+    public static int going_up_velocity = 280;
+    public static int going_down_velocity = -280;
     public static double speed_mm_per_sec = 200; // mm/s
-    public static int wait_time = 5000;
+    public static int wait_time = 1000;
     public static int threshold = 50;
     enum State{
         START_GOING_UP,

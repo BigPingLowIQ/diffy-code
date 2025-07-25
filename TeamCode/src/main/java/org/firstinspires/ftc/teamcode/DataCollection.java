@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import static android.content.Context.MODE_PRIVATE;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.widget.Toast;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -31,7 +32,7 @@ public class DataCollection {
     public DataCollection(Telemetry telemetry){
         this.telemetry = telemetry;
         Date now = new Date();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss", Locale.getDefault());
         file_name = formatter.format(now);
     }
 
@@ -46,12 +47,18 @@ public class DataCollection {
             e.printStackTrace();
         }
 
-
-        telemetry.addData("Efficiency",calculate_efficiency(velocity_tick_per_sec,voltage,motor_current));
+        telemetry.addData("file_name",file_name);
+//        telemetry.addData("Efficiency",calculate_efficiency(velocity_tick_per_sec,voltage,motor_current));
     }
     private double calculate_efficiency(double w, double V, double I){
         w = w * 2 * Math.PI * r / 140;
         return (mass * g * w * r * Math.PI)/(30*V*I);
+    }
+
+    public void writeToInternalFile(String content){
+        try {
+            FileOutputStream fos = this.openFileOutput(file_name)
+        }catch (IOException ignored){ignored.printStackTrace();}
     }
 
 
