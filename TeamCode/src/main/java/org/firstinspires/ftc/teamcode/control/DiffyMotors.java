@@ -18,6 +18,7 @@ import java.util.ArrayList;
 @Config
 public class DiffyMotors {
     public DcMotorEx m1,m2;
+    public Encoder e1,e2;
     private int o1pos,o2pos;
     private int o1target,o2target;
     private double o1vel,o2vel;
@@ -28,13 +29,11 @@ public class DiffyMotors {
     public static double pv=0,iv=0,dv=0;
     private RUN_MODE run_mode = RUN_MODE.POSITION_PID;
     private double[] powers = {0,0};
-    public enum RUN_MODE{
-        POSITION_PID,
-        VELOCITY_PID
-    }
     public DiffyMotors(HardwareMap hm){
         this.m1 = new DcMotorImplEx(hm.get(DcMotorController.class,"Control Hub"),3);
-        this.m2 = new DcMotorImplEx(hm.get(DcMotorController.class,"Control Hub"),0);
+        this.m2 = new DcMotorImplEx(hm.get(DcMotorController.class,"Control Hub"),0); // extendo
+        this.e1 = new Encoder(m1);
+        this.e2 = new Encoder(m2);
         m1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         m2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         m1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -44,6 +43,7 @@ public class DiffyMotors {
         m2.setDirection(DcMotorSimple.Direction.REVERSE);
         o1pos = o2pos = o1target = o2target = 0;
         o1vel = o2vel = o1targetvel = o2targetvel = 0;
+        e2.setDirection(Encoder.Direction.REVERSE);
     }
 
     public void update(Telemetry telemetry){
@@ -74,8 +74,8 @@ public class DiffyMotors {
             telemetry.addData("power2", powers[1]);
 
         }else if(run_mode == RUN_MODE.VELOCITY_PID){
-            o1vel = m1.getVelocity()/(1<<8);
-            o2vel = m2.getVelocity()/(1<<8);
+            o1vel = e1.getCorrectedVelocity()/(1<<8);
+            o2vel = e2.getCorrectedVelocity()/(1<<8);
 
             double[] inputTargetVelocities = calculateDiffyInputs(o1targetvel,o2targetvel);
             double[] inputVelocities = calculateDiffyInputs(o1vel,o2vel);

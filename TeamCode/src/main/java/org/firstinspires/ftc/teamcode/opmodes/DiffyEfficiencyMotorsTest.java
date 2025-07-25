@@ -5,28 +5,33 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 
+import org.firstinspires.ftc.teamcode.control.DiffyEfficiencyMotors;
 import org.firstinspires.ftc.teamcode.control.DiffyMotors;
-import org.firstinspires.ftc.teamcode.control.RUN_MODE;
 
-@TeleOp
+
 @Config
-public class MotorsVelocityTest extends LinearOpMode {
-    DiffyMotors motors;
-    public static int target1=0,target2=0;
+@TeleOp
+public class DiffyEfficiencyMotorsTest extends LinearOpMode {
+    public DiffyEfficiencyMotors motors;
+    public static int targetPos=0;
+    public static double targetVelocity=0;
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        motors = new DiffyMotors(hardwareMap);
-        motors.setRunMode(RUN_MODE.VELOCITY_PID);
+        motors = new DiffyEfficiencyMotors(hardwareMap);
         waitForStart();
 
-        while (opModeIsActive()) {
-            motors.setOutputVelocityTargets(target1, target2);
+        while(opModeIsActive()){
+            motors.setTargetPosition(targetPos);
+            motors.setTargetVelocity(targetVelocity);
+
+
             motors.update(telemetry);
             telemetry.update();
         }
+
+
     }
 }

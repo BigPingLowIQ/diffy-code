@@ -12,7 +12,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.VoltageUnit;
 import org.firstinspires.ftc.teamcode.DataCollection;
+import org.firstinspires.ftc.teamcode.control.DiffyEfficiencyMotors;
 import org.firstinspires.ftc.teamcode.control.DiffyMotors;
+import org.firstinspires.ftc.teamcode.control.RUN_MODE;
 import org.firstinspires.ftc.teamcode.control.TimeInterpolation;
 
 import java.util.concurrent.TimeUnit;
@@ -20,13 +22,15 @@ import java.util.concurrent.TimeUnit;
 @Config
 @TeleOp
 public class WeightInterpolationTest extends LinearOpMode {
-    DiffyMotors motors;
-    TimeInterpolation up;
-    TimeInterpolation down;
+    DiffyEfficiencyMotors motors;
     DataCollection data;
-    public static int target1start=0,target1end=2000,target2=0;
+    public static int downPosition = 200;
+    public static int upPosition = 2000;
+    public static int going_up_velocity = 140;
+    public static int going_down_velocity = 140;
     public static double speed_mm_per_sec = 200; // mm/s
-    public static int wait_time = 1000;
+    public static int wait_time = 5000;
+    public static int threshold = 50;
     enum State{
         START_GOING_UP,
         GOING_UP,
@@ -37,73 +41,76 @@ public class WeightInterpolationTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        motors = new DiffyMotors(hardwareMap);
-        up = new TimeInterpolation(target1end-target1start, speed_mm_per_sec);
-        down = new TimeInterpolation(target1end-target1start, speed_mm_per_sec);
+        motors = new DiffyEfficiencyMotors(hardwareMap);
         data = new DataCollection(telemetry,2);
-        LynxModule ch = hardwareMap.getAll(LynxModule.class).get(0);
         State state = State.START_GOING_UP;
         ElapsedTime timer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+        motors.setTargetPosition(downPosition);
 
-        double sum = 0;
-        double n = 0;
 
         waitForStart();
 
         timer.startTime();
         timer.reset();
-        motors.setOutputTargets(0,0);
+
         while(opModeIsActive()){
             switch (state){
-                case START_GOING_DOWN:{
-                    if(timer.time()>wait_time){
-                        down.start();
-                        state = State.GOING_DOWN;
-                    }
-                    break;
-                }
-                case GOING_DOWN:{
-                    motors.setOutputTargets(target2,target1start+down.getPosition());
-                    if(!down.isInterpolating()){
-                        state = State.START_GOING_UP;
+                case START_GOING_UP:{
+                    if(!isInThreshold(motors.getCurrentPosition(), motors.getTargetPosition(), threshold)){
                         timer.reset();
                         timer.startTime();
-                    }
-                    n++;
-                    sum += Math.abs(motors.getVelocities()[1]);
-                    break;
-                }
-                case START_GOING_UP:{
-                    if(timer.time(TimeUnit.MILLISECONDS)>wait_time){
-                        up.start();
+                    }else if(timer.time()>wait_time) {
                         state = State.GOING_UP;
+
+                        motors.setTargetVelocity(going_up_velocity);
+                        motors.setRunMode(RUN_MODE.VELOCITY_PID);
                     }
                     break;
                 }
                 case GOING_UP:{
-                    motors.setOutputTargets(target2,target1end-up.getPosition());
-                    if(!up.isInterpolating()){
+                    if(motors.getCurrentPosition()>upPosition){
                         state = State.START_GOING_DOWN;
+                        motors.setRunMode(RUN_MODE.POSITION_PID);
+                        motors.setTargetPosition(upPosition);
                         timer.reset();
                         timer.startTime();
                     }
-                    n++;
-                    sum += Math.abs(motors.getVelocities()[1]);
                     break;
                 }
+                case START_GOING_DOWN:{
+                    if(!isInThreshold(motors.getCurrentPosition(), motors.getTargetPosition(), threshold)){
+                        timer.reset();
+                        timer.startTime();
+                    }else if(timer.time()>wait_time) {
+                        state = State.GOING_DOWN;
+                        motors.setTargetVelocity(going_down_velocity);
+                        motors.setRunMode(RUN_MODE.VELOCITY_PID);
+                    }
+                    break;
+                }
+                case GOING_DOWN:{
+                    if(motors.getCurrentPosition()<downPosition){
+                        state = State.START_GOING_UP;
+                        motors.setRunMode(RUN_MODE.POSITION_PID);
+                        motors.setTargetPosition(downPosition);
+                        timer.reset();
+                        timer.startTime();
+                    }
+                    break;
+                }
+
+
             }
 
-
-
-            //telemetry.addData("Velocity",motors.getVelocities()[0]);
-            telemetry.addData("Velocity",motors.getVelocities()[1]);
-            telemetry.addData("Mean Velocity",sum/n);
-            telemetry.addData("State",state);
-            telemetry.addData("Target",motors.getOutputTargets()[1]);
-            telemetry.addData("Current",motors.getOutputCurrents()[1]);
+            telemetry.addData("time",timer.time());
+            telemetry.addData("state",state);
             telemetry.update();
-            data.update(motors.getVelocities()[0],motors.getMotorsCurrents()[0],ch.getInputVoltage(VoltageUnit.VOLTS));
             motors.update(telemetry);
         }
     }
+
+    public boolean isInThreshold(int curr,int target,int threshold){
+        return Math.abs(target-curr)<threshold;
+    }
+
 }
