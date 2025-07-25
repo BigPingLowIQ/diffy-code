@@ -12,15 +12,20 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.VoltageUnit;
 import org.firstinspires.ftc.teamcode.DataCollection;
+import org.firstinspires.ftc.teamcode.FileLogger;
 import org.firstinspires.ftc.teamcode.control.DiffyEfficiencyMotors;
 import org.firstinspires.ftc.teamcode.control.RUN_MODE;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 @Config
 @TeleOp
 public class WeightInterpolationTest extends LinearOpMode {
+    private static final Logger log = LoggerFactory.getLogger(WeightInterpolationTest.class);
     DiffyEfficiencyMotors motors;
     DataCollection data;
     public static int downPosition = 200;
@@ -31,6 +36,7 @@ public class WeightInterpolationTest extends LinearOpMode {
     public static int wait_time = 1000;
     public static int threshold = 50;
     public static int HZ_LIMIT = 100;
+    public static FileLogger logger;
     enum State{
         START_GOING_UP,
         GOING_UP,
@@ -40,6 +46,9 @@ public class WeightInterpolationTest extends LinearOpMode {
     }
     @Override
     public void runOpMode() throws InterruptedException {
+        logger = new FileLogger();
+        logger.open();
+
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         motors = new DiffyEfficiencyMotors(hardwareMap);
         data = new DataCollection(telemetry);
@@ -124,11 +133,7 @@ public class WeightInterpolationTest extends LinearOpMode {
             while(hz_timer.time(TimeUnit.MILLISECONDS)<(1000d/HZ_LIMIT)){}
             telemetry.addData("hz",1000d/hz_timer.time(TimeUnit.MILLISECONDS));
         }
-        try {
-            data.writer.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        logger.close();
     }
 
     public boolean isInThreshold(int curr,int target,int threshold){
