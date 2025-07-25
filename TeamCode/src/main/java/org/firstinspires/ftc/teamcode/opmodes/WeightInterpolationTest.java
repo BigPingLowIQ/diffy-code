@@ -7,18 +7,14 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.VoltageUnit;
 import org.firstinspires.ftc.teamcode.DataCollection;
 import org.firstinspires.ftc.teamcode.control.DiffyEfficiencyMotors;
-import org.firstinspires.ftc.teamcode.control.DiffyMotors;
 import org.firstinspires.ftc.teamcode.control.RUN_MODE;
-import org.firstinspires.ftc.teamcode.control.TimeInterpolation;
 
-import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 
 @Config
