@@ -1,10 +1,15 @@
 package org.firstinspires.ftc.teamcode;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.annotation.SuppressLint;
+import android.widget.Toast;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -33,6 +38,13 @@ public class DataCollection {
     public void update(double velocity_tick_per_sec,double motor_current, double voltage, long time){
         @SuppressLint("DefaultLocale") String line = String.format("Time: %d, Velocity: %.2f, Motor_current: %.2f, Voltage: %.2f,",time ,velocity_tick_per_sec,motor_current,voltage);
 
+        try {
+            FileWriter writer = new FileWriter(file_name);
+            writer.write(line);
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
 
         telemetry.addData("Efficiency",calculate_efficiency(velocity_tick_per_sec,voltage,motor_current));
