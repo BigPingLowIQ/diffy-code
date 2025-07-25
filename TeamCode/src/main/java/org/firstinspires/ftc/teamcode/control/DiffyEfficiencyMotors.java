@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotorImplEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 @Config
 public class DiffyEfficiencyMotors {
@@ -78,6 +79,9 @@ public class DiffyEfficiencyMotors {
     }
     public void setRunMode(RUN_MODE mode){
         runMode = mode;
+    }
+    public double getCurrentDraw(){
+        return m1.getCurrent(CurrentUnit.AMPS)+m2.getCurrent(CurrentUnit.AMPS);
     }
 
     public int getCurrentPosition() {

@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.VoltageUnit;
 import org.firstinspires.ftc.teamcode.DataCollection;
 import org.firstinspires.ftc.teamcode.control.DiffyEfficiencyMotors;
@@ -17,6 +18,7 @@ import org.firstinspires.ftc.teamcode.control.DiffyMotors;
 import org.firstinspires.ftc.teamcode.control.RUN_MODE;
 import org.firstinspires.ftc.teamcode.control.TimeInterpolation;
 
+import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 
 @Config
@@ -42,18 +44,29 @@ public class WeightInterpolationTest extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         motors = new DiffyEfficiencyMotors(hardwareMap);
-        data = new DataCollection(telemetry,2);
+        data = new DataCollection(telemetry);
+        LynxModule ch = hardwareMap.getAll(LynxModule.class).get(0);
         State state = State.START_GOING_UP;
+        ElapsedTime run_timer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
         ElapsedTime timer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+        ElapsedTime hz_timer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
         motors.setTargetPosition(downPosition);
 
+        for (LynxModule hub : hardwareMap.getAll(LynxModule.class)) {
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        }
 
         waitForStart();
 
-        timer.startTime();
         timer.reset();
+        timer.startTime();
+        hz_timer.reset();
+        hz_timer.startTime();
 
         while(opModeIsActive()){
+            for (LynxModule hub : hardwareMap.getAll(LynxModule.class))
+                hub.clearBulkCache();
+
             switch (state){
                 case START_GOING_UP:{
                     if(!isInThreshold(motors.getCurrentPosition(), motors.getTargetPosition(), threshold)){
@@ -98,14 +111,17 @@ public class WeightInterpolationTest extends LinearOpMode {
                     }
                     break;
                 }
-
-
             }
 
+            data.update(motors.getCurrentVelocity(),ch.getCurrent(CurrentUnit.AMPS),ch.getInputVoltage(VoltageUnit.VOLTS),run_timer.time(TimeUnit.MILLISECONDS));
+            motors.update(telemetry);
             telemetry.addData("time",timer.time());
             telemetry.addData("state",state);
+            telemetry.addData("hz",1000/hz_timer.time());
             telemetry.update();
-            motors.update(telemetry);
+
+            // loop time throttling
+            while(hz_timer.time()<(1000d/200)){}
         }
     }
 
