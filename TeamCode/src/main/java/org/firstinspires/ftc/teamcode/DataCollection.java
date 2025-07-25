@@ -37,17 +37,9 @@ public class DataCollection {
     }
 
     public void update(double velocity_tick_per_sec,double motor_current, double voltage, long time){
-        @SuppressLint("DefaultLocale") String line = String.format("Time: %d, Velocity: %.2f, Motor_current: %.2f, Voltage: %.2f,",time ,velocity_tick_per_sec,motor_current,voltage);
+        @SuppressLint("DefaultLocale") String line = String.format("Time: %d, Velocity: %.2f, Motor_current: %.2f, Voltage: %.2f \n",time ,velocity_tick_per_sec,motor_current,voltage);
+        writeLogFile(line);
 
-        try {
-            FileWriter writer = new FileWriter(file_name);
-            writer.write(line);
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        telemetry.addData("file_name",file_name);
 //        telemetry.addData("Efficiency",calculate_efficiency(velocity_tick_per_sec,voltage,motor_current));
     }
     private double calculate_efficiency(double w, double V, double I){
@@ -55,10 +47,23 @@ public class DataCollection {
         return (mass * g * w * r * Math.PI)/(30*V*I);
     }
 
-    public void writeToInternalFile(String content){
+    private void writeLogFile(String content) {
         try {
-            FileOutputStream fos = this.openFileOutput(file_name)
-        }catch (IOException ignored){ignored.printStackTrace();}
+            // Get the directory where you can safely store files
+            File dir = new File("/sdcard/FIRST/");
+            if (!dir.exists()) {
+                dir.mkdirs(); // Create it if needed
+            }
+
+            // Create or overwrite the file inside that directory
+            File file = new File(dir, file_name);
+            FileWriter writer = new FileWriter(file);
+            writer.append(content);
+            writer.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
