@@ -9,30 +9,31 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class DataCollection {
     public static double mass = 2; //kg
     public static double g=9.81; // m/s^2
     public static double r=16; // mm
     private Telemetry telemetry;
-    private Path path;
+    private final String file_name;
     public DataCollection(Telemetry telemetry){
         this.telemetry = telemetry;
-        LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String formatted = now.format(formatter);
-        path = Paths.get(formatted);
+        Date now = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        file_name = formatter.format(now);
     }
 
     public void update(double velocity_tick_per_sec,double motor_current, double voltage, long time){
         @SuppressLint("DefaultLocale") String line = String.format("Time: %d, Velocity: %.2f, Motor_current: %.2f, Voltage: %.2f,",time ,velocity_tick_per_sec,motor_current,voltage);
-        try {
-            Files.write(path, List.of(line));
-        } catch (IOException e) {System.err.println("Error writing to file: " + e.getMessage());}
+
+
 
         telemetry.addData("Efficiency",calculate_efficiency(velocity_tick_per_sec,voltage,motor_current));
     }
