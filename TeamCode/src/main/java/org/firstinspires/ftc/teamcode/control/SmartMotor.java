@@ -9,17 +9,13 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
-@Config
+
 public class SmartMotor  {
     private DcMotorEx motor;
     private PIDController pid;
     private int target;
     public static double kp=0.03,ki=0.000008,kd=0.0001;
 
-    enum RUN_MODE{
-        POSITION_PID,
-        VELOCITY_PID
-    }
 
     protected SmartMotor(DcMotorEx motor, boolean reverse){
         this.motor = motor;

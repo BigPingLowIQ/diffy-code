@@ -37,7 +37,7 @@ public class WeightInterpolationTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        motors = new DiffyMotors(hardwareMap.get(DcMotorEx.class, "m2"),hardwareMap.get(DcMotorEx.class,"m1"));
+        motors = new DiffyMotors(hardwareMap);
         up = new TimeInterpolation(target1end-target1start, speed_mm_per_sec);
         down = new TimeInterpolation(target1end-target1start, speed_mm_per_sec);
         data = new DataCollection(telemetry,2);
@@ -103,7 +103,7 @@ public class WeightInterpolationTest extends LinearOpMode {
             telemetry.addData("Current",motors.getOutputCurrents()[1]);
             telemetry.update();
             data.update(motors.getVelocities()[0],motors.getMotorsCurrents()[0],ch.getInputVoltage(VoltageUnit.VOLTS));
-            motors.update();
+            motors.update(telemetry);
         }
     }
 }

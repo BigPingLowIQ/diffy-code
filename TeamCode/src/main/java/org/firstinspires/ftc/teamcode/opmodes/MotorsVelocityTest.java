@@ -9,9 +9,9 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.control.DiffyMotors;
 
-@TeleOp(name="motor position test")
+@TeleOp
 @Config
-public class MotorPositionTest extends LinearOpMode {
+public class MotorsVelocityTest extends LinearOpMode {
     DiffyMotors motors;
     public static int target1=0,target2=0;
     @Override
@@ -19,18 +19,11 @@ public class MotorPositionTest extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         motors = new DiffyMotors(hardwareMap);
+        motors.setRunMode(DiffyMotors.RUN_MODE.VELOCITY_PID);
         waitForStart();
 
-        while(opModeIsActive()){
-            motors.setOutputTargets(target1,target2);
-            telemetry.addData("O1Target",motors.getOutputTargets()[0]);
-            telemetry.addData("O1Current",motors.getOutputCurrents()[0]);
-            telemetry.addData("O2Target",motors.getOutputTargets()[1]);
-            telemetry.addData("O2Current",motors.getOutputCurrents()[1]);
-//            telemetry.addData("I1Target",motors.m1.getTarget());
-//            telemetry.addData("I1Current",motors.m1.getPosition());
-//            telemetry.addData("I2Target",motors.m2.getTarget());
-//            telemetry.addData("I2Current",motors.m2.getPosition());
+        while (opModeIsActive()) {
+            motors.setOutputVelocityTargets(target1, target2);
             motors.update(telemetry);
             telemetry.update();
         }
