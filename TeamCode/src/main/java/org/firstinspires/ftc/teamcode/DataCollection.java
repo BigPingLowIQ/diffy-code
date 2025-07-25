@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -52,19 +53,29 @@ public class DataCollection {
     }
 
     private boolean writeLogFile(String content) {
-        File dir = new File("/sdcard/FIRST/");
-        if (!dir.exists()) {
-            dir.mkdirs(); // Create it if needed
-        }
-
-        // Create or overwrite the file inside that directory
-        File file = new File(dir, file_name);
         try {
-            writer = new FileWriter(file, true);
-            writer.append(content);
-            writer.close();
+            // Use /sdcard/FIRST/, which is usually safe for FTC apps
+            File dir = new File("/sdcard/FIRST/");
+            if (!dir.exists()) {
+                dir.mkdirs(); // Create the directory if needed
+            }
+
+            // Create or open the file for appending
+            File file = new File(dir, file_name);
+
+            // Append mode = true
+            FileWriter fw = new FileWriter(file, true);
+            BufferedWriter bw = new BufferedWriter(fw);
+
+            // Write and force flush
+            bw.write(content);
+            bw.newLine();  // Optional: adds a newline
+            bw.flush();    // 🔧 Very important: force flush to file system
+            bw.close();    // 🔧 Always close to release system buffer
             return true;
-        }catch (IOException e){e.printStackTrace(); return false;}
+        } catch (IOException e) {
+            e.printStackTrace();return false;
+        }
     }
 
 
