@@ -15,6 +15,7 @@ import org.firstinspires.ftc.teamcode.DataCollection;
 import org.firstinspires.ftc.teamcode.control.DiffyEfficiencyMotors;
 import org.firstinspires.ftc.teamcode.control.RUN_MODE;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 @Config
@@ -29,6 +30,7 @@ public class WeightInterpolationTest extends LinearOpMode {
     public static double speed_mm_per_sec = 200; // mm/s
     public static int wait_time = 1000;
     public static int threshold = 50;
+    public static int HZ_LIMIT = 100;
     enum State{
         START_GOING_UP,
         GOING_UP,
@@ -60,6 +62,8 @@ public class WeightInterpolationTest extends LinearOpMode {
         hz_timer.startTime();
 
         while(opModeIsActive()){
+            hz_timer.reset();
+            hz_timer.startTime();
             for (LynxModule hub : hardwareMap.getAll(LynxModule.class))
                 hub.clearBulkCache();
 
@@ -113,11 +117,17 @@ public class WeightInterpolationTest extends LinearOpMode {
             motors.update(telemetry);
             telemetry.addData("time",timer.time());
             telemetry.addData("state",state);
-            telemetry.addData("hz",1000/hz_timer.time());
+            telemetry.addData("limit",1000d/HZ_LIMIT);
             telemetry.update();
 
             // loop time throttling
-            while(hz_timer.time()<(1000d/200)){}
+            while(hz_timer.time(TimeUnit.MILLISECONDS)<(1000d/HZ_LIMIT)){}
+            telemetry.addData("hz",1000d/hz_timer.time(TimeUnit.MILLISECONDS));
+        }
+        try {
+            data.writer.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

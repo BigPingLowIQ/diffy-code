@@ -29,17 +29,21 @@ public class DataCollection {
     public static double r=16; // mm
     private Telemetry telemetry;
     private final String file_name;
+    public FileWriter writer;
     public DataCollection(Telemetry telemetry){
         this.telemetry = telemetry;
         Date now = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss", Locale.getDefault());
-        file_name = formatter.format(now);
+        file_name = (formatter.format(now)+".csv");
+        // Get the directory where you can safely store file
+        writeLogFile("Time, Velocity, Motor_current, Voltage");
     }
 
     public void update(double velocity_tick_per_sec,double motor_current, double voltage, long time){
-        @SuppressLint("DefaultLocale") String line = String.format("Time: %d, Velocity: %.2f, Motor_current: %.2f, Voltage: %.2f \n",time ,velocity_tick_per_sec,motor_current,voltage);
-        writeLogFile(line);
+        @SuppressLint("DefaultLocale") String line = String.format("\n %d , %.2f , %.2f , %.2f",time ,velocity_tick_per_sec,motor_current,voltage);
+        boolean yes = writeLogFile(line);
 
+        telemetry.addData("writing",yes);
 //        telemetry.addData("Efficiency",calculate_efficiency(velocity_tick_per_sec,voltage,motor_current));
     }
     private double calculate_efficiency(double w, double V, double I){
@@ -47,23 +51,20 @@ public class DataCollection {
         return (mass * g * w * r * Math.PI)/(30*V*I);
     }
 
-    private void writeLogFile(String content) {
-        try {
-            // Get the directory where you can safely store files
-            File dir = new File("/sdcard/FIRST/");
-            if (!dir.exists()) {
-                dir.mkdirs(); // Create it if needed
-            }
+    private boolean writeLogFile(String content) {
+        File dir = new File("/sdcard/FIRST/");
+        if (!dir.exists()) {
+            dir.mkdirs(); // Create it if needed
+        }
 
-            // Create or overwrite the file inside that directory
-            File file = new File(dir, file_name);
-            FileWriter writer = new FileWriter(file);
+        // Create or overwrite the file inside that directory
+        File file = new File(dir, file_name);
+        try {
+            writer = new FileWriter(file, true);
             writer.append(content);
             writer.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            return true;
+        }catch (IOException e){e.printStackTrace(); return false;}
     }
 
 
