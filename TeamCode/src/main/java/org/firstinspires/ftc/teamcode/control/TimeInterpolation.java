@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.control;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.DataCollection;
+import org.firstinspires.ftc.teamcode.TCPServer.DataCollection;
 
 import java.util.concurrent.TimeUnit;
 

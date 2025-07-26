@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.TCPServer;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -11,7 +11,7 @@ import java.util.Locale;
 public class FileLogger {
     private BufferedWriter writer;
     private int linesSinceFlush = 0;
-    private static final int FLUSH_THRESHOLD = 10;
+    private static final int FLUSH_THRESHOLD = 50;
 
 
     public void open() {

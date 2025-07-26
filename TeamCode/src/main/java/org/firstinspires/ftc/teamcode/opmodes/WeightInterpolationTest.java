@@ -11,15 +11,14 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.VoltageUnit;
-import org.firstinspires.ftc.teamcode.DataCollection;
-import org.firstinspires.ftc.teamcode.FileLogger;
+import org.firstinspires.ftc.teamcode.TCPServer.DataCollection;
+import org.firstinspires.ftc.teamcode.TCPServer.FileLogger;
+import org.firstinspires.ftc.teamcode.TCPServer.Server;
 import org.firstinspires.ftc.teamcode.control.DiffyEfficiencyMotors;
 import org.firstinspires.ftc.teamcode.control.RUN_MODE;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 @Config
@@ -62,6 +61,8 @@ public class WeightInterpolationTest extends LinearOpMode {
         for (LynxModule hub : hardwareMap.getAll(LynxModule.class)) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
+
+        new Server().start();
 
         waitForStart();
 
@@ -126,11 +127,14 @@ public class WeightInterpolationTest extends LinearOpMode {
             motors.update(telemetry);
             telemetry.addData("time",timer.time());
             telemetry.addData("state",state);
-            telemetry.addData("limit",1000d/HZ_LIMIT);
             telemetry.update();
 
             // loop time throttling
-            while(hz_timer.time(TimeUnit.MILLISECONDS)<(1000d/HZ_LIMIT)){}
+            long sleep = (long)((1000d/HZ_LIMIT)-hz_timer.time());
+            telemetry.addData("sleep",sleep);
+            if(sleep>0)
+              sleep(sleep);
+            //while(hz_timer.time(TimeUnit.MILLISECONDS)<(1000d/HZ_LIMIT)){}
             telemetry.addData("hz",1000d/hz_timer.time(TimeUnit.MILLISECONDS));
         }
         logger.close();

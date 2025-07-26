@@ -1,29 +1,11 @@
-package org.firstinspires.ftc.teamcode;
-
-import static android.content.Context.MODE_PRIVATE;
+package org.firstinspires.ftc.teamcode.TCPServer;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
-import android.widget.Toast;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.opmodes.WeightInterpolationTest;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 
 public class DataCollection {
     public static double mass = 2; //kg
