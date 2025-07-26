@@ -45,8 +45,8 @@ public class WeightInterpolationTest extends LinearOpMode {
     }
     @Override
     public void runOpMode() throws InterruptedException {
-        logger = new FileLogger();
-        logger.open();
+//        logger = new FileLogger();
+//        logger.open();
 
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         motors = new DiffyEfficiencyMotors(hardwareMap);
@@ -137,7 +137,7 @@ public class WeightInterpolationTest extends LinearOpMode {
             //while(hz_timer.time(TimeUnit.MILLISECONDS)<(1000d/HZ_LIMIT)){}
             telemetry.addData("hz",1000d/hz_timer.time(TimeUnit.MILLISECONDS));
         }
-        logger.close();
+//        logger.close();
     }
 
     public boolean isInThreshold(int curr,int target,int threshold){
