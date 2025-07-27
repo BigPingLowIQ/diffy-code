@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotorImplEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 @Config
@@ -98,5 +99,8 @@ public class DiffyEfficiencyMotors {
 
     public double getCurrentVelocity() {
         return currentVelocity;
+    }
+    public double getCurrentVelocityRadians() {
+        return e.getRawVelocityRadians();
     }
 }

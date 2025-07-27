@@ -17,6 +17,8 @@ import java.util.ArrayList;
 
 @Config
 public class DiffyMotors {
+    // PTO DISENGAGED POS 0.3
+    // PTO ENGAGED POS „
     public DcMotorEx m1,m2;
     public Encoder e1,e2;
     private int o1pos,o2pos;

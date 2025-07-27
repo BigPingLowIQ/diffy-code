@@ -4,6 +4,8 @@ import com.acmerobotics.roadrunner.util.NanoClock;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+
 /**
  * Wraps a motor instance to provide corrected velocity counts and allow reversing independently of the corresponding
  * slot's motor direction
@@ -107,6 +109,10 @@ public class Encoder {
     public double getRawVelocity() {
         int multiplier = getMultiplier();
         return motor.getVelocity() * multiplier;
+    }
+    public double getRawVelocityRadians() {
+        int multiplier = getMultiplier();
+        return motor.getVelocity(AngleUnit.RADIANS) * multiplier;
     }
 
     /**
